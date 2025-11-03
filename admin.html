@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SV5T</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --mau-chinh: #0D47A1; /* Xanh đậm Admin */
+            --mau-nen: #f4f7f6;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--mau-nen);
+        }
+        /* Layout Admin */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+        .admin-sidebar {
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            padding: 1.5rem;
+        }
+        .admin-sidebar h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--mau-chinh);
+            margin-bottom: 2rem;
+        }
+        .admin-nav-item {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        .admin-nav-item:hover, .admin-nav-item.active {
+            background-color: #e3f2fd;
+            color: var(--mau-chinh);
+            font-weight: 600;
+        }
+        .admin-main {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .admin-page {
+            display: none;
+        }
+        .admin-page.active {
+            display: block;
+        }
+        .admin-page h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--mau-chinh);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5rem;
+        }
+        /* Form chung */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            min-height: 150px;
+        }
+        .btn-submit {
+            background-color: var(--mau-chinh);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #0b3a82;
+        }
+        .btn-danger {
+            background-color: #d9534f;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+        }
+        /* Bảng dữ liệu */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+        }
+        /* Trang duyệt hồ sơ */
+        .assessment-list-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .assessment-list-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .status-pending { color: #f0ad4e; }
+        .status-approved { color: #5cb85c; }
+        .status-rejected { color: #d9534f; }
+        
+        #assessment-detail-view { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <h1>Admin Panel SV5T</h1>
+            <nav id="admin-nav" class="space-y-2">
+                <button class="admin-nav-item active" data-page="page-assessments">Duyệt hồ sơ</button>
+                <button class="admin-nav-item" data-page="page-criteria">Quản lý Tiêu chí</button>
+                <button class="admin-nav-item" data-page="page-news">Quản lý Tin tức</button>
+                <button class="admin-nav-item" data-page="page-stories">Quản lý Câu chuyện</button>
+                <button class="admin-nav-item" data-page="page-chatbot">Quản lý Chatbot</button>
+            </nav>
+            <div class="mt-8 text-sm text-gray-600">
+                Admin User ID: <span id="admin-user-id" class="font-semibold">...</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- 1. Trang Duyệt hồ sơ -->
+            <div id="page-assessments" class="admin-page active">
+                <h2>Duyệt hồ sơ Tự đánh giá</h2>
+                
+                <!-- Danh sách hồ sơ -->
+                <div id="assessment-list-view">
+                    <h3 class="text-xl font-semibold mb-4">Danh sách hồ sơ chờ duyệt</h3>
+                    <div id="assessment-list-container" class="space-y-3">
+                        <p>Đang tải danh sách hồ sơ...</p>
+                    </div>
+                </div>
+
+                <!-- Chi tiết 1 hồ sơ -->
+                <div id="assessment-detail-view">
+                    <button id="back-to-list-btn" class="mb-4 text-blue-600 font-semibold">&larr; Quay lại danh sách</button>
+                    <h3 class="text-xl font-semibold mb-4">Chi tiết hồ sơ của: <span id="detail-user-id" class="text-gray-700"></span></h3>
+                    
+                    <div id="detail-criteria-container" class="mb-6 space-y-4">
+                        <!-- Nội dung chi tiết được tải bằng JS -->
+                    </div>
+
+                    <form id="feedback-form">
+                        <input type="hidden" id="feedback-doc-path">
+                        <div class="form-group">
+                            <label for="admin-feedback-main">Phản hồi chung:</label>
+                            <textarea id="admin-feedback-main" rows="4" placeholder="Nhập phản hồi chung cho sinh viên..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-status-select">Cập nhật trạng thái:</label>
+                            <select id="admin-status-select">
+                                <option value="pending">Chờ duyệt</option>
+                                <option value="approved">Đã duyệt (Đạt)</option>
+                                <option value="rejected">Cần bổ sung (Trượt)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-submit">Lưu phản hồi & Cập nhật trạng thái</button>
+                    </form>
+                    <div id="feedback-message" class="mt-4"></div>
+                </div>
+            </div>
+
+            <!-- 2. Trang Quản lý Tiêu chí -->
+            <div id="page-criteria" class="admin-page">
+                <h2>Quản lý Bộ tiêu chí</h2>
+                <form id="criteria-form">
+                    <div class="form-group">
+                        <label for="criteria-level-select">Chọn cấp để chỉnh sửa:</label>
+                        <select id="criteria-level-select">
+                            <option value="cap_truong_dknn">Cấp Trường ĐHNN, ĐHĐN</option>
+                            <option value="cap_dhdn">Cấp Đại học Đà Nẵng</option>
+                            <option value="cap_thanhpho_dn">Cấp Thành phố Đà Nẵng</option>
+                            <option value="cap_trunguong">Cấp Trung ương</option>
+                        </select>
+                    </div>
+                    
+                    <p class="text-sm mb-4 text-gray-600">Bạn có thể dùng HTML cơ bản (như &lt;br&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;b&gt;) để định dạng văn bản.</p>
+                    
+                    <div class="form-group">
+                        <label for="criteria-dao-duc">Tiêu chí Đạo đức:</label>
+                        <textarea id="criteria-dao-duc" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="criteria-hoc-tap">Tiêu chí Học tập:</label>
+                        <textarea id="criteria-hoc-tap" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="criteria-the-luc">Tiêu chí Thể lực:</label>
+                        <textarea id="criteria-the-luc" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="criteria-tinh-nguyen">Tiêu chí Tình nguyện:</label>
+                        <textarea id="criteria-tinh-nguyen" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="criteria-hoi-nhap">Tiêu chí Hội nhập:</label>
+                        <textarea id="criteria-hoi-nhap" rows="5"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Lưu thay đổi</button>
+                    <div id="criteria-message" class="mt-4"></div>
+                </form>
+            </div>
+
+            <!-- 3. Trang Quản lý Tin tức -->
+            <div id="page-news" class="admin-page">
+                <h2>Quản lý Tin tức</h2>
+                <form id="news-form" class="mb-8 p-6 bg-white rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-4">Thêm/Cập nhật bài viết</h3>
+                    <input type="hidden" id="news-doc-id">
+                    <div class="form-group">
+                        <label for="news-title">Tiêu đề:</label>
+                        <input type="text" id="news-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="news-image-url">Link ảnh bìa:</label>
+                        <input type="text" id="news-image-url" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="news-content">Nội dung:</label>
+                        <textarea id="news-content" rows="6" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Lưu bài viết</button>
+                    <button type="button" id="news-clear-btn" class="ml-2">Hủy (Tạo mới)</button>
+                    <div id="news-message" class="mt-4"></div>
+                </form>
+
+                <h3 class="text-xl font-semibold mb-4">Danh sách tin tức</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Tiêu đề</th><th>Hành động</th></tr>
+                    </thead>
+                    <tbody id="news-list-table">
+                        <!-- Dữ liệu tải từ Firestore -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 4. Trang Quản lý Câu chuyện -->
+            <div id="page-stories" class="admin-page">
+                <h2>Quản lý Những câu chuyện</h2>
+                <form id="stories-form" class="mb-8 p-6 bg-white rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-4">Thêm/Cập nhật câu chuyện</h3>
+                    <input type="hidden" id="stories-doc-id">
+                    <div class="form-group">
+                        <label for="stories-title">Tiêu đề:</label>
+                        <input type="text" id="stories-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stories-image-url">Link ảnh bìa:</label>
+                        <input type="text" id="stories-image-url" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="stories-content">Nội dung:</label>
+                        <textarea id="stories-content" rows="6" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Lưu câu chuyện</button>
+                    <button type="button" id="stories-clear-btn" class="ml-2">Hủy (Tạo mới)</button>
+                    <div id="stories-message" class="mt-4"></div>
+                </form>
+
+                <h3 class="text-xl font-semibold mb-4">Danh sách câu chuyện</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Tiêu đề</th><th>Hành động</th></tr>
+                    </thead>
+                    <tbody id="stories-list-table">
+                        <!-- Dữ liệu tải từ Firestore -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 5. Trang Quản lý Chatbot -->
+            <div id="page-chatbot" class="admin-page">
+                <h2>Quản lý Chatbot (Dạy câu trả lời)</h2>
+                <p class="mb-4 text-gray-700">Thêm các cặp câu hỏi - trả lời mới để Chatbot tự động học. Câu hỏi không cần chính xác tuyệt đối, chatbot sẽ tự tìm từ khóa tương ứng.</p>
+                <form id="chatbot-form" class="mb-8 p-6 bg-white rounded-lg shadow">
+                    <input type="hidden" id="chatbot-doc-id">
+                    <div class="form-group">
+                        <label for="chatbot-question">Câu hỏi (Từ khóa):</label>
+                        <input type="text" id="chatbot-question" placeholder="Ví dụ: nộp hồ sơ trễ" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="chatbot-answer">Câu trả lời:</label>
+                        <textarea id="chatbot-answer" rows="4" placeholder="Nhập câu trả lời chính xác..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Lưu Q&A</button>
+                    <button type="button" id="chatbot-clear-btn" class="ml-2">Hủy</button>
+                    <div id="chatbot-message" class="mt-4"></div>
+                </form>
+
+                <h3 class="text-xl font-semibold mb-4">Danh sách Q&A đã lưu</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Câu hỏi</th><th>Câu trả lời</th><th>Hành động</th></tr>
+                    </thead>
+                    <tbody id="chatbot-list-table">
+                        <!-- Dữ liệu tải từ Firestore -->
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import các hàm từ Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            // signInWithCustomToken, // Không dùng trên GitHub Pages
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc, 
+            deleteDoc,
+            onSnapshot, 
+            collection, 
+            query,
+            addDoc,
+            serverTimestamp,
+            getDocs,
+            where
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CẤU HÌNH FIREBASE (QUAN TRỌNG!) ---
+        // BƯỚC 1: Đã thêm config Firebase của bạn
+        const firebaseConfig = {
+          apiKey: "AIzaSyDl14prYvMw4ES8AyCmTRrG0mG4PLTFOMk",
+          authDomain: "website-tu-van-sv5t.firebaseapp.com",
+          projectId: "website-tu-van-sv5t",
+          storageBucket: "website-tu-van-sv5t.firebasestorage.app",
+          messagingSenderId: "2501484852",
+          appId: "1:2501484852:web:f445a3400ebcc8d8304561"
+        };
+        
+        // BƯỚC 2: Đặt một ID cho ứng dụng của bạn
+        // (Phải giống hệt với file index.html và trong Firebase Rules)
+        const appId = 'sv5t-app-id-cua-ban'; // <-- GIỮ NGUYÊN ID NÀY
+        
+        // Khởi tạo Firebase
+        let app, db, auth;
+        
+        // Khởi tạo app
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+
+        let adminUserId = null;
+
+        // --- HÀM KHỞI CHẠY CHÍNH ---
+        async function main() {
+            await setupAdminAuth();
+            setupAdminNavigation();
+            
+            // Khởi tạo các module
+            setupCriteriaManager();
+            setupArticleManager('news', 'news-form', 'news-doc-id', 'news-title', 'news-image-url', 'news-content', 'news-message', 'news-clear-btn', 'news-list-table');
+            setupArticleManager('stories', 'stories-form', 'stories-doc-id', 'stories-title', 'stories-image-url', 'stories-content', 'stories-message', 'stories-clear-btn', 'stories-list-table');
+            setupChatbotManager();
+            setupAssessmentManager();
+        }
+
+        // --- 1. XÁC THỰC ADMIN ---
+        async function setupAdminAuth() {
+            const userIdDiv = document.getElementById('admin-user-id');
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    adminUserId = user.uid;
+                    userIdDiv.textContent = adminUserId.substring(0, 10) + "...";
+                }
+            });
+
+            try {
+                // BƯỚC 3: Chỉ dùng signInAnonymously cho GitHub Pages
+                await signInAnonymously(auth);
+                console.log("Admin đã xác thực (ẩn danh).");
+            } catch (error) {
+                console.error("Lỗi xác thực Admin:", error);
+                userIdDiv.textContent = "Lỗi kết nối";
+                // Hiển thị lỗi cho người dùng
+                if (error.code === 'auth/internal-error') {
+                    alert("LỖI CẤU HÌNH FIREBASE: Bạn chưa dán firebaseConfig của mình vào file admin.html, hoặc cấu hình bị sai. Vui lòng kiểm tra lại.");
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    alert("LỖI CẤU HÌNH FIREBASE: Bạn chưa bật phương thức đăng nhập 'Anonymous' (Ẩn danh) trong Firebase Authentication. Vui lòng vào trang quản trị Firebase để bật.");
+                }
+            }
+        }
+
+        // --- 2. ĐIỀU HƯỚNG ADMIN ---
+        function setupAdminNavigation() {
+            const nav = document.getElementById('admin-nav');
+            const navItems = nav.querySelectorAll('.admin-nav-item');
+            const pages = document.querySelectorAll('.admin-page');
+
+            nav.addEventListener('click', (e) => {
+                if (e.target.classList.contains('admin-nav-item')) {
+                    const pageId = e.target.dataset.page;
+                    
+                    // Cập nhật trạng thái active cho nút
+                    navItems.forEach(item => item.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // Hiện trang
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                }
+            });
+        }
+
+        // --- 3. QUẢN LÝ TIÊU CHÍ ---
+        function setupCriteriaManager() {
+            const form = document.getElementById('criteria-form');
+            const levelSelect = document.getElementById('criteria-level-select');
+            const messageDiv = document.getElementById('criteria-message');
+            
+            const fields = ['dao-duc', 'hoc-tap', 'the-luc', 'tinh-nguyen', 'hoi-nhap'];
+            const inputs = {};
+            fields.forEach(f => inputs[f] = document.getElementById(`criteria-${f}`));
+
+            const colRef = collection(db, `/artifacts/${appId}/public/data/criteria`);
+
+            // Hàm tải dữ liệu khi thay đổi select
+            async function loadCriteriaData() {
+                const level = levelSelect.value;
+                messageDiv.textContent = "Đang tải...";
+                try {
+                    const docRef = doc(colRef, level);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        fields.forEach(f => {
+                            if (inputs[f]) inputs[f].value = data[f] || '';
+                        });
+                        messageDiv.textContent = `Đã tải dữ liệu cho: ${level}`;
+                        messageDiv.className = "text-green-600";
+                    } else {
+                        // Nếu chưa có, xóa trống form
+                        fields.forEach(f => { if (inputs[f]) inputs[f].value = ''; });
+                        messageDiv.textContent = "Chưa có dữ liệu cho cấp này. Bấm lưu để tạo mới.";
+                        messageDiv.className = "text-yellow-600";
+                    }
+                } catch (error) {
+                    console.error("Lỗi tải tiêu chí:", error);
+                    messageDiv.textContent = "Lỗi tải dữ liệu.";
+                    messageDiv.className = "text-red-600";
+                }
+            }
+
+            // Tải lần đầu
+            loadCriteriaData();
+            // Tải khi thay đổi
+            levelSelect.addEventListener('change', loadCriteriaData);
+
+            // Xử lý submit
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const level = levelSelect.value;
+                const dataToSave = {};
+                fields.forEach(f => dataToSave[f] = inputs[f].value);
+                
+                messageDiv.textContent = "Đang lưu...";
+                try {
+                    const docRef = doc(colRef, level);
+                    await setDoc(docRef, dataToSave, { merge: true }); // setDoc với merge=true sẽ tạo mới nếu chưa có, hoặc cập nhật
+                    messageDiv.textContent = "Lưu thành công!";
+                    messageDiv.className = "text-green-600";
+                } catch (error) {
+                    console.error("Lỗi lưu tiêu chí:", error);
+                    messageDiv.textContent = "Lỗi khi lưu.";
+                    messageDiv.className = "text-red-600";
+                    if (error.code === 'permission-denied') {
+                        alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể lưu tiêu chí. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                    }
+                }
+            });
+
+            // Gán dữ liệu mặc định cho cấp Trường ĐHNN
+            if (levelSelect.value === 'cap_truong_dknn' && inputs['dao-duc'].value === '') {
+                inputs['dao-duc'].value = "- Không vi phạm pháp luật và các quy chế, nội quy...\n- Đạt thêm 01 trong các tiêu chí sau:\n  + Điểm rèn luyện... đạt từ 85 điểm...\n  + Điểm rèn luyện... đạt từ 80 điểm... (áp dụng cho... hoạt động chính trị - tư tưởng)";
+                inputs['hoc-tap'].value = "Điểm trung bình học tập năm học 2023-2024 đạt từ 3.2/4.0 trở lên.";
+                inputs['the-luc'].value = "Đạt 01 trong các tiêu chí sau:\n- Điểm trung bình môn thể dục... đạt loại khá...\n- Tham gia và có giấy chứng nhận tại các phong trào, hoạt động thể thao...\n- Là thành viên đội tuyển...\n- Tham gia rèn luyện thể thao định kỳ...\n- Tham gia... teambuilding...";
+                inputs['tinh-nguyen'].value = "Đạt 01 trong các tiêu chuẩn sau:\n- Tham gia... chiến dịch tình nguyện hè, Đông - Xuân...\n- Đạt 01 Giấy chứng nhận tham gia hoạt động tình nguyện tại chỗ...\n- Được giấy khen... về hoạt động tình nguyện.";
+                inputs['hoi-nhap'].value = "Đạt 01 trong các tiêu chí sau:\n- Tham gia ít nhất 01 hoạt động hội nhập...\n- Đạt chứng chỉ ngoại ngữ 2 trình độ A2... hoặc B1 Anh...\n- Tham gia và đạt giải... cuộc thi về ngoại ngữ...";
+            }
+        }
+
+        // --- 4. QUẢN LÝ CHUNG (TIN TỨC, CÂU CHUYỆN) ---
+        function setupArticleManager(collectionName, formId, docIdField, titleField, imgField, contentField, msgDiv, clearBtn, tableBody) {
+            const form = document.getElementById(formId);
+            const docIdInput = document.getElementById(docIdField);
+            const titleInput = document.getElementById(titleField);
+            const imgInput = document.getElementById(imgField);
+            const contentInput = document.getElementById(contentField);
+            const messageDiv = document.getElementById(msgDiv);
+            const clearButton = document.getElementById(clearBtn);
+            const listTable = document.getElementById(tableBody);
+
+            const colRef = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
+
+            // Hàm reset form
+            function clearForm() {
+                form.reset();
+                docIdInput.value = '';
+                messageDiv.textContent = '';
+            }
+            clearButton.addEventListener('click', clearForm);
+
+            // Tải danh sách
+            onSnapshot(colRef, (snapshot) => {
+                listTable.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${data.title}</td>
+                        <td class="space-x-2">
+                            <button class="edit-btn text-blue-600" data-id="${doc.id}">Sửa</button>
+                            <button class="delete-btn btn-danger" data-id="${doc.id}">Xóa</button>
+                        </td>
+                    `;
+                    listTable.appendChild(row);
+                });
+            }, (error) => {
+                 console.error(`Lỗi tải ${collectionName}: `, error);
+                if (error.code === 'permission-denied') {
+                    alert(`LỖI QUYỀN TRUY CẬP FIREBASE: Không thể đọc ${collectionName}. Vui lòng kiểm tra lại Firebase Security Rules của bạn.`);
+                }
+            });
+
+            // Xử lý Sửa / Xóa
+            listTable.addEventListener('click', async (e) => {
+                const target = e.target;
+                const id = target.dataset.id;
+                if (!id) return;
+
+                const docRef = doc(colRef, id);
+                if (target.classList.contains('delete-btn')) {
+                    if (confirm("Bạn có chắc muốn xóa bài viết này?")) {
+                        try {
+                            await deleteDoc(docRef);
+                            messageDiv.textContent = "Xóa thành công!";
+                        } catch (error) {
+                            console.error("Lỗi xóa:", error);
+                            if (error.code === 'permission-denied') {
+                                alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể xóa. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                            }
+                        }
+                    }
+                } else if (target.classList.contains('edit-btn')) {
+                    try {
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            docIdInput.value = docSnap.id;
+                            titleInput.value = data.title;
+                            imgInput.value = data.imageUrl;
+                            contentInput.value = data.content;
+                            window.scrollTo(0, 0); // Cuộn lên đầu trang
+                        }
+                    } catch (error) {
+                        console.error("Lỗi tải để sửa:", error);
+                    }
+                }
+            });
+
+            // Xử lý Submit (Thêm mới / Cập nhật)
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const docId = docIdInput.value;
+                const data = {
+                    title: titleInput.value,
+                    imageUrl: imgInput.value,
+                    content: contentInput.value,
+                    createdAt: serverTimestamp()
+                };
+
+                try {
+                    if (docId) { // Cập nhật
+                        await setDoc(doc(colRef, docId), data);
+                        messageDiv.textContent = "Cập nhật thành công!";
+                    } else { // Thêm mới
+                        await addDoc(colRef, data);
+                        messageDiv.textContent = "Thêm mới thành công!";
+                    }
+                    clearForm();
+                } catch (error) {
+                    console.error("Lỗi lưu:", error);
+                    messageDiv.textContent = "Lỗi khi lưu.";
+                    if (error.code === 'permission-denied') {
+                        alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể lưu. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                    }
+                }
+            });
+        }
+
+        // --- 5. QUẢN LÝ CHATBOT ---
+        function setupChatbotManager() {
+            const form = document.getElementById('chatbot-form');
+            const docIdInput = document.getElementById('chatbot-doc-id');
+            const questionInput = document.getElementById('chatbot-question');
+            const answerInput = document.getElementById('chatbot-answer');
+            const messageDiv = document.getElementById('chatbot-message');
+            const clearButton = document.getElementById('chatbot-clear-btn');
+            const listTable = document.getElementById('chatbot-list-table');
+
+            const colRef = collection(db, `/artifacts/${appId}/public/data/chatbot_qa`);
+
+            function clearForm() {
+                form.reset();
+                docIdInput.value = '';
+                messageDiv.textContent = '';
+            }
+            clearButton.addEventListener('click', clearForm);
+
+            onSnapshot(colRef, (snapshot) => {
+                listTable.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${data.question}</td>
+                        <td>${data.answer.substring(0, 50)}...</td>
+                        <td class="space-x-2">
+                            <button class="edit-btn text-blue-600" data-id="${doc.id}">Sửa</button>
+                            <button class="delete-btn btn-danger" data-id="${doc.id}">Xóa</button>
+                        </td>
+                    `;
+                    listTable.appendChild(row);
+                });
+            }, (error) => {
+                console.error("Lỗi tải Chatbot Q&A: ", error);
+                if (error.code === 'permission-denied') {
+                    alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể đọc Q&A. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                }
+            });
+
+            listTable.addEventListener('click', async (e) => {
+                const target = e.target;
+                const id = target.dataset.id;
+                if (!id) return;
+
+                const docRef = doc(colRef, id);
+                if (target.classList.contains('delete-btn')) {
+                    if (confirm("Bạn có chắc muốn xóa Q&A này?")) {
+                        await deleteDoc(docRef);
+                    }
+                } else if (target.classList.contains('edit-btn')) {
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        docIdInput.value = docSnap.id;
+                        questionInput.value = data.question;
+                        answerInput.value = data.answer;
+                        window.scrollTo(0, 0);
+                    }
+                }
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const docId = docIdInput.value;
+                const data = {
+                    question: questionInput.value,
+                    answer: answerInput.value,
+                };
+
+                try {
+                    if (docId) {
+                        await setDoc(doc(colRef, docId), data);
+                    } else {
+                        await addDoc(colRef, data);
+                    }
+                    clearForm();
+                    messageDiv.textContent = "Lưu Q&A thành công!";
+                } catch (error) {
+                    console.error("Lỗi lưu Q&A:", error);
+                    messageDiv.textContent = "Lỗi khi lưu.";
+                     if (error.code === 'permission-denied') {
+                        alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể lưu Q&A. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                    }
+                }
+            });
+        }
+        
+        // --- 6. QUẢN LÝ HỒ SƠ TỰ ĐÁNH GIÁ ---
+        function setupAssessmentManager() {
+            const listView = document.getElementById('assessment-list-view');
+            const detailView = document.getElementById('assessment-detail-view');
+            const listContainer = document.getElementById('assessment-list-container');
+            const backBtn = document.getElementById('back-to-list-btn');
+            const feedbackForm = document.getElementById('feedback-form');
+            const feedbackMessage = document.getElementById('feedback-message');
+
+            backBtn.addEventListener('click', () => {
+                listView.style.display = 'block';
+                detailView.style.display = 'none';
+            });
+
+            // Tải tất cả hồ sơ từ collection public 'assessments'
+            const q = query(collection(db, `/artifacts/${appId}/public/data/assessments`));
+            
+            // Hàm tải danh sách (dùng onSnapshot để tự động cập nhật)
+            function loadAssessmentList() {
+                listContainer.innerHTML = "<p>Đang tải danh sách...</p>";
+                
+                onSnapshot(q, (assessSnapshot) => {
+                    if (assessSnapshot.empty) {
+                        listContainer.innerHTML = "<p>Chưa có hồ sơ nào được nộp.</p>";
+                        return;
+                    }
+
+                    let allAssessments = [];
+                    assessSnapshot.forEach(doc => {
+                        allAssessments.push({ 
+                            id: doc.id, 
+                            path: doc.ref.path, 
+                            data: doc.data() 
+                        });
+                    });
+
+                    // Sắp xếp, ưu tiên 'pending'
+                    allAssessments.sort((a, b) => {
+                        if (a.data.status === 'pending' && b.data.status !== 'pending') return -1;
+                        if (a.data.status !== 'pending' && b.data.status === 'pending') return 1;
+                        // Sắp xếp theo thời gian nộp mới nhất
+                        const timeA = a.data.submittedAt?.seconds || 0;
+                        const timeB = b.data.submittedAt?.seconds || 0;
+                        return timeB - timeA;
+                    });
+
+                    listContainer.innerHTML = '';
+                    allAssessments.forEach(item => {
+                        const data = item.data;
+                        let statusText = "Chưa rõ";
+                        let statusClass = "status-pending";
+                        switch (data.status) {
+                            case "pending": statusText = "Chờ duyệt"; statusClass = "status-pending"; break;
+                            case "approved": statusText = "Đã duyệt"; statusClass = "status-approved"; break;
+                            case "rejected": statusText = "Cần bổ sung"; statusClass = "status-rejected"; break;
+                        }
+                        
+                        const div = document.createElement('div');
+                        div.className = 'assessment-list-item';
+                        div.dataset.path = item.path; // Lưu đường dẫn đầy đủ
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-semibold text-lg text-gray-800">${data.level} (${data.year})</span>
+                                    <span class="block text-sm text-gray-500">User: ${data.userId ? data.userId.substring(0, 10) : 'N/A'}...</span>
+                                </div>
+                                <span class="font-bold text-lg ${statusClass}">${statusText}</span>
+                            </div>
+                        `;
+                        listContainer.appendChild(div);
+                    });
+
+                }, (error) => {
+                    console.error("Lỗi khi tải hồ sơ:", error);
+                    listContainer.innerHTML = `<p class="text-red-600">Lỗi khi tải danh sách: ${error.message}</p>`;
+                    if (error.code === 'permission-denied') {
+                        alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể đọc hồ sơ. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                    }
+                });
+            }
+            
+            loadAssessmentList(); // Tải lần đầu
+
+            // Click vào 1 item để xem chi tiết
+            listContainer.addEventListener('click', async (e) => {
+                const item = e.target.closest('.assessment-list-item');
+                if (!item) return;
+
+                const path = item.dataset.path;
+                if (!path) return;
+
+                try {
+                    const docSnap = await getDoc(doc(db, path)); // Dùng path đầy đủ
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        document.getElementById('detail-user-id').textContent = data.userId;
+                        document.getElementById('feedback-doc-path').value = path;
+                        document.getElementById('admin-feedback-main').value = data.adminFeedback || '';
+                        document.getElementById('admin-status-select').value = data.status;
+
+                        // Hiển thị chi tiết tiêu chí
+                        const detailContainer = document.getElementById('detail-criteria-container');
+                        detailContainer.innerHTML = '';
+                        // Kiểm tra nếu data.criteria tồn tại
+                        if (data.criteria) {
+                            for (const [key, value] of Object.entries(data.criteria)) {
+                                const metClass = value.met ? "text-green-600" : "text-red-600";
+                                const metText = value.met ? "Đã chọn" : "Không chọn";
+                                
+                                detailContainer.innerHTML += `
+                                    <div class="p-4 border rounded-lg bg-white">
+                                        <h4 class="text-lg font-semibold capitalize">${key.replace('_', ' ')} [<span class="${metClass}">${metText}</span>]</h4>
+                                        <a href="${value.proof}" target="_blank" class="text-blue-500 hover:underline">Xem minh chứng</a>
+                                        <div class="form-group mt-2">
+                                            <label for="note-${key}" class="text-sm font-medium">Ghi chú cho tiêu chí này:</label>
+                                            <input type="text" id="note-${key}" data-key="${key}" class="admin-note-input w-full p-2 border rounded" value="${value.adminNotes || ''}" placeholder="Minh chứng hợp lệ / Minh chứng sai...">
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        } else {
+                            detailContainer.innerHTML = "<p>Lỗi: Không tìm thấy dữ liệu tiêu chí trong hồ sơ này.</p>";
+                        }
+                        
+                        listView.style.display = 'none';
+                        detailView.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error("Lỗi tải chi tiết:", error);
+                }
+            });
+
+            // Gửi phản hồi
+            feedbackForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const path = document.getElementById('feedback-doc-path').value;
+                if (!path) return;
+
+                feedbackMessage.textContent = "Đang lưu...";
+                
+                try {
+                    const docRef = doc(db, path); // Dùng path đầy đủ
+                    const updateData = {
+                        adminFeedback: document.getElementById('admin-feedback-main').value,
+                        status: document.getElementById('admin-status-select').value
+                    };
+
+                    // Thu thập các ghi chú chi tiết
+                    document.querySelectorAll('.admin-note-input').forEach(input => {
+                        const key = input.dataset.key;
+                        updateData[`criteria.${key}.adminNotes`] = input.value;
+                    });
+                    
+                    await updateDoc(docRef, updateData);
+                    feedbackMessage.textContent = "Lưu phản hồi thành công!";
+                    feedbackMessage.className = "text-green-600";
+                    
+                    // Tải lại danh sách (không cần vì đã dùng onSnapshot)
+                    // loadAssessmentList();
+                    
+                    // Tự động quay về danh sách
+                    setTimeout(() => {
+                        listView.style.display = 'block';
+                        detailView.style.display = 'none';
+                        feedbackMessage.textContent = "";
+                    }, 1500);
+
+                } catch (error) {
+                    console.error("Lỗi lưu phản hồi:", error);
+                    feedbackMessage.textContent = "Lỗi khi lưu phản hồi.";
+                    feedbackMessage.className = "text-red-600";
+                    if (error.code === 'permission-denied') {
+                        alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể lưu phản hồi. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                    }
+                }
+            });
+        }
+
+        // --- KHỞI CHẠY ---
+        main();
+    </script>
+</body>
+</html>
