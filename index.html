@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Tư vấn Sinh viên 5 tốt</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải icon (Heroicons) -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <style>
+        /* Tùy chỉnh màu sắc theo yêu cầu */
+        :root {
+            --mau-chinh: #009688; /* Màu xanh cyan/Hội Sinh viên */
+            --mau-nen: #f0f9ff; /* Màu nền xanh nhạt */
+            --mau-chu: #0D47A1;  /* Màu chữ xanh đậm */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--mau-nen);
+        }
+        .header-bg {
+            background-color: white;
+            border-bottom: 4px solid var(--mau-chinh);
+        }
+        .banner {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+        }
+        /* Giao diện các mục điều hướng giống ảnh */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .nav-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .nav-item {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--mau-chu);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .nav-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 150, 136, 0.2);
+            color: var(--mau-chinh);
+        }
+        .nav-item ion-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            color: var(--mau-chinh);
+        }
+        
+        /* Hiển thị nội dung trang */
+        .page-content {
+            display: none; /* Ẩn tất cả các trang ban đầu */
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+        }
+        .page-content.active {
+            display: block; /* Hiển thị trang được chọn */
+        }
+        
+        /* Tùy chỉnh cho Chatbot */
+        #chat-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: #fafafa;
+        }
+        .chat-message {
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #e0f2f1; /* Màu xanh nhạt */
+            color: #004d40;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .bot-message {
+            background-color: #ffffff;
+            border: 1px solid #b2dfdb;
+            color: #00796b;
+            align-self: flex-start;
+        }
+        .quick-reply-btn {
+            background-color: white;
+            border: 1px solid var(--mau-chinh);
+            color: var(--mau-chinh);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 0.25rem;
+        }
+        .quick-reply-btn:hover {
+            background-color: var(--mau-chinh);
+            color: white;
+        }
+
+        /* Tùy chỉnh cho Bộ tiêu chí */
+        .criteria-select-btn {
+            display: block;
+            width: 100%;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background-color: #e0f2f1;
+            color: var(--mau-chinh);
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .criteria-select-btn:hover {
+            background-color: var(--mau-chinh);
+            color: white;
+        }
+        .criteria-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        .criteria-table th, .criteria-table td {
+            border: 1px solid #b2dfdb;
+            padding: 1rem;
+            text-align: left;
+        }
+        .criteria-table th {
+            background-color: #e0f2f1;
+            color: var(--mau-chu);
+            font-size: 1.25rem;
+        }
+
+        /* Tùy chỉnh cho Tự đánh giá */
+        .assessment-group {
+            margin-bottom: 2rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+        .assessment-group h3 {
+            font-size: 1.5rem;
+            color: var(--mau-chu);
+            border-bottom: 2px solid var(--mau-chinh);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .assessment-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .assessment-item input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-top: 0.25rem;
+            margin-right: 0.75rem;
+            accent-color: var(--mau-chinh);
+        }
+        .assessment-item label {
+            flex: 1;
+        }
+        .proof-upload {
+            margin-top: 1.5rem;
+        }
+        .proof-upload label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--mau-chu);
+        }
+        .proof-upload input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+        }
+        
+        /* Tùy chỉnh cho Tin tức & Câu chuyện */
+        .article-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .article-card:hover {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .article-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .article-card-content {
+            padding: 1.5rem;
+        }
+        .article-card-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--mau-chu);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="header-bg shadow-md">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="https://res.cloudinary.com/dgjebimmk/image/upload/v1762153727/SV5T_sujztn.png" alt="Logo SV5T" class="h-16 w-16 mr-4">
+                <h1 class="text-xl md:text-3xl font-bold" style="color: var(--mau-chu);">
+                    Website Tư vấn Sinh viên 5 tốt
+                </h1>
+            </div>
+            <div class="text-sm text-gray-600">
+                <!-- Thông tin đăng nhập người dùng -->
+                <div id="user-info">Đang tải...</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <div>
+        <img src="https://res.cloudinary.com/dgjebimmk/image/upload/v1762153550/WEBSITE_T%C6%AF_V%E1%BA%A4N_SINH_VI%C3%8AN_5_T%E1%BB%90T_9_exovvk.png" alt="Banner Website" class="banner">
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Grid Điều hướng (Giống ảnh) -->
+        <nav class="nav-grid">
+            <div class="nav-item" data-page="trang-chu">
+                <ion-icon name="home-outline"></ion-icon>
+                <span>Trang chủ</span>
+            </div>
+            <div class="nav-item" data-page="tu-van">
+                <ion-icon name="chatbubbles-outline"></ion-icon>
+                <span>Tư vấn</span>
+            </div>
+            <div class="nav-item" data-page="bo-tieu-chi">
+                <ion-icon name="list-outline"></ion-icon>
+                <span>Bộ tiêu chí</span>
+            </div>
+            <div class="nav-item" data-page="tu-theo-doi">
+                <ion-icon name="eye-outline"></ion-icon>
+                <span>Tự theo dõi</span>
+            </div>
+            <div class="nav-item" data-page="tu-danh-gia">
+                <ion-icon name="checkbox-outline"></ion-icon>
+                <span>Tự đánh giá</span>
+            </div>
+            <div class="nav-item" data-page="tin-tuc">
+                <ion-icon name="newspaper-outline"></ion-icon>
+                <span>Tin tức</span>
+            </div>
+            <div class="nav-item" data-page="nhung-cau-chuyen">
+                <ion-icon name="book-outline"></ion-icon>
+                <span>Những câu chuyện</span>
+            </div>
+            <div class="nav-item" data-page="lien-he">
+                <ion-icon name="mail-outline"></ion-icon>
+                <span>Liên hệ</span>
+            </div>
+        </nav>
+
+        <!-- Vùng chứa nội dung các trang -->
+        
+        <!-- Trang chủ -->
+        <div id="page-trang-chu" class="page-content active">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Chào mừng đến với Website Tư vấn Sinh viên 5 tốt!</h2>
+            
+            <p class="mb-4 text-lg">
+                Danh hiệu "Sinh viên 5 tốt" là một danh hiệu cao quý do Trung ương Hội Sinh viên Việt Nam phát động, nhằm tôn vinh sự nỗ lực của sinh viên qua 5 tiêu chí: Học tập tốt – Đạo đức tốt – Thể lực tốt – Tình nguyện tốt – Hội nhập tốt. Phong trào này khuyến khích sinh viên phát triển toàn diện, rèn luyện các kỹ năng cần thiết cho tương lai.
+            </p>
+            <p class="mb-6 text-lg">
+                Các bạn sinh viên tham gia đăng ký xét chọn Danh hiệu Sinh viên 5 tốt cấp Trường Đại học Ngoại ngữ, ĐHĐN năm học 2024 - 2025 lưu ý những thông tin sau để không bỏ lỡ cơ hội đạt được danh hiệu cao quý này nhé!
+            </p>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--mau-chinh);">ĐỐI TƯỢNG THAM GIA ĐĂNG KÝ XÉT CẤP TRƯỜNG:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Đối tượng là sinh viên từ khoá K21 đến khoá K24, hiện đang theo học tại Trường Đại học Ngoại ngữ, Đại học Đà Nẵng.</li>
+                        <li>Đáp ứng tiêu chuẩn Sinh viên 5 tốt cấp Trường ĐHNN, ĐHĐN: Học tập tốt, Đạo đức tốt, Thể lực tốt, Tình nguyện tốt, Hội nhập tốt.</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--mau-chinh);">THỜI GIAN NHẬN HỒ SƠ ĐĂNG KÝ XÉT CẤP TRƯỜNG:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Đăng ký online từ ngày 03/9/2025 đến hết ngày 09/9/2025</li>
+                        <li>Hạn cuối nhận báo cáo thành tích bản cứng: 12/9/2025.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--mau-chinh);">*LƯU Ý DÀNH CHO HỒ SƠ ĐĂNG KÝ XÉT CẤP TRƯỜNG:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Đối với hồ sơ online (bản mềm): Các file minh chứng được đăng tải phải là file scan từ bản gốc (KHÔNG được đăng tải bản photo), BCTT phải nộp 2 định dạng là Word và PDF (in BCTT, ký tên, scan và đăng tải lên thư mục cá nhân);</li>
+                        <li>Đối với hồ sơ bản cứng: Chỉ nộp bản in BCTT đã có chữ ký của người kê khai.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--mau-chinh);">QUY TRÌNH ĐĂNG KÝ XÉT CHỌN DANH HIỆU SINH VIÊN 5 TỐT CẤP TRƯỜNG ĐHNN, ĐHĐN:</h3>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Bước 1: Sinh viên điền form đăng ký online, thực hiện đầy đủ các yêu cầu trong form này (khuyến khích điền form bằng máy tính để thuận tiện thao tác);</li>
+                        <li>Bước 2: Hoàn thiện đăng tải thư mục hồ sơ bản mềm tương ứng với các cấp xét;</li>
+                        <li>Bước 3: Theo dõi thông tin phản hồi về trạng thái hồ sơ bản mềm từ ĐTN - HSV Nhà trường; song song, hoàn thiện báo cáo thành tích bản cứng và nộp về Văn phòng ĐTN - HSV Nhà trường;</li>
+                        <li>Bước 4: Bổ sung các thành tích bản mềm và chỉnh sửa BCTT bản cứng sau phản hồi (nếu có) trong thời gian quy định.</li>
+                        <li>Bước 5: HSV Nhà trường tiến hành công tác xét chọn hồ sơ và công bố kết quả.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trang Tư vấn (Chatbot) -->
+        <div id="page-tu-van" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Tư vấn cùng Chatbot SV5T</h2>
+            <div id="chat-container" class="mb-4 flex flex-col">
+                <!-- Tin nhắn của bot -->
+                <div class="chat-message bot-message">
+                    Cảm ơn bạn đã đến với Website Tư vấn Sinh viên 5 tốt, bạn muốn hỏi gì về Danh hiệu Sinh viên 5 tốt?
+                </div>
+                <!-- Nút bấm nhanh -->
+                <div id="quick-replies" class="flex flex-wrap justify-start mt-2">
+                    <button class="quick-reply-btn" data-question="Xin chào SV5T, tôi muốn được tư vấn">Xin chào!</button>
+                    <button class="quick-reply-btn" data-question="Danh hiệu Sinh viên 5 tốt là gì?">SV5T là gì?</button>
+                    <button class="quick-reply-btn" data-question="Để xét danh hiệu Sinh viên 5 tốt cấp Trường Đại học Ngoại ngữ, Đại học Đà Nẵng, cần phải đạt những tiêu chí nào?">Tiêu chí cấp Trường?</button>
+                </div>
+            </div>
+            <div class="flex">
+                <input type="text" id="chat-input" class="flex-grow border border-gray-300 rounded-l-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Nhập câu hỏi của bạn...">
+                <button id="send-btn" class="bg-cyan-600 text-white rounded-r-full px-6 py-3 font-semibold hover:bg-cyan-700 transition duration-300">Gửi</button>
+            </div>
+        </div>
+
+        <!-- Trang Bộ tiêu chí -->
+        <div id="page-bo-tieu-chi" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Bộ tiêu chí Sinh viên 5 tốt</h2>
+            
+            <!-- Vùng chọn cấp -->
+            <div id="criteria-selection" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="criteria-select-btn" data-level="cap_truong_dknn">
+                    Cấp Trường Đại học Ngoại ngữ, Đại học Đà Nẵng
+                </button>
+                <button class="criteria-select-btn" data-level="cap_dhdn" disabled>
+                    Cấp Đại học Đà Nẵng (Đang cập nhật)
+                </button>
+                <button class="criteria-select-btn" data-level="cap_thanhpho_dn" disabled>
+                    Cấp Thành phố Đà Nẵng (Đang cập nhật)
+                </button>
+                <button class="criteria-select-btn" data-level="cap_trunguong" disabled>
+                    Cấp Trung ương (Đang cập nhật)
+                </button>
+            </div>
+
+            <!-- Vùng hiển thị nội dung tiêu chí -->
+            <div id="criteria-content" class="mt-8" style="display: none;">
+                <button id="back-to-selection" class="mb-4 text-cyan-600 hover:text-cyan-800 font-semibold">
+                    &larr; Quay lại chọn cấp
+                </button>
+                <h3 id="criteria-title" class="text-2xl font-bold mb-4" style="color: var(--mau-chinh);"></h3>
+                <div id="criteria-details" class="space-y-4">
+                    <!-- Nội dung sẽ được tải từ JS/Firestore -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Trang Tự theo dõi -->
+        <div id="page-tu-theo-doi" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Theo dõi tiến độ</h2>
+            <p class="mb-4">Đây là nơi bạn theo dõi hồ sơ "Tự đánh giá" của mình sau khi đã nộp.</p>
+            <div id="tracking-status" class="p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 class="text-xl font-semibold text-blue-800 mb-3">Hồ sơ cấp Trường ĐHNN (2024-2025)</h3>
+                <div id="tracking-content">
+                    <!-- Nội dung được tải từ JS/Firestore -->
+                    <p>Chưa tìm thấy hồ sơ. Vui lòng nộp hồ sơ ở mục "Tự đánh giá" trước.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trang Tự đánh giá -->
+        <div id="page-tu-danh-gia" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Tự đánh giá hồ sơ (Cấp Trường ĐHNN)</h2>
+            <p class="mb-6">Đánh dấu vào các tiêu chí bạn đã đạt được và cung cấp đường link chứa minh chứng (Google Drive, OneDrive...) đã được mở quyền truy cập công khai.</p>
+            
+            <form id="assessment-form">
+                <!-- Tiêu chí 1: Đạo đức -->
+                <div class="assessment-group">
+                    <h3>1. Tiêu chí Đạo đức</h3>
+                    <p class="mb-4 font-semibold">Yêu cầu bắt buộc: Không vi phạm pháp luật và các quy chế, nội quy của nhà trường, quy định của địa phương và cộng đồng.</p>
+                    <p class="mb-4 font-semibold">Và đạt thêm 01 trong các tiêu chí sau:</p>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="dao-duc-1" name="dao_duc_options">
+                        <label for="dao-duc-1">Điểm rèn luyện trung bình của học kì I năm học 2023-2024 đạt từ 85 điểm trở lên.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="dao-duc-2" name="dao_duc_options">
+                        <label for="dao-duc-2">Điểm rèn luyện trung bình của học kì I năm học 2023-2024 đạt từ 80 điểm trở lên (áp dụng cho sinh viên có minh chứng tham gia ít nhất 01 hoạt động về chính trị - tư tưởng).</label>
+                    </div>
+                    <div class="proof-upload">
+                        <label for="proof_dao_duc">Link minh chứng Đạo đức:</label>
+                        <input type="text" id="proof_dao_duc" name="proof_dao_duc" placeholder="Dán link Google Drive/OneDrive minh chứng...">
+                    </div>
+                </div>
+
+                <!-- Tiêu chí 2: Học tập -->
+                <div class="assessment-group">
+                    <h3>2. Tiêu chí Học tập</h3>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="hoc-tap-1" name="hoc_tap_options">
+                        <label for="hoc-tap-1">Điểm trung bình học tập năm học 2023-2024 đạt từ 3.2/4.0 trở lên.</label>
+                    </div>
+                    <div class="proof-upload">
+                        <label for="proof_hoc_tap">Link minh chứng Học tập:</label>
+                        <input type="text" id="proof_hoc_tap" name="proof_hoc_tap" placeholder="Dán link Google Drive/OneDrive minh chứng...">
+                    </div>
+                </div>
+
+                <!-- Tiêu chí 3: Thể lực -->
+                <div class="assessment-group">
+                    <h3>3. Tiêu chí Thể lực</h3>
+                    <p class="mb-4 font-semibold">Đạt 01 trong các tiêu chí sau:</p>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="the-luc-1" name="the_luc_options">
+                        <label for="the-luc-1">Điểm trung bình môn thể dục trong năm học 2023-2024 đạt loại khá trở lên.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="the-luc-2" name="the_luc_options">
+                        <label for="the-luc-2">Tham gia và có giấy chứng nhận tại các phong trào, hoạt động thể thao cấp Câu lạc bộ, Liên Chi hội, Liên Chi đoàn trở lên.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="the-luc-3" name="the_luc_options">
+                        <label for="the-luc-3">Là thành viên đội tuyển hoặc cá nhân tham gia thi đấu tại hội thao hoặc các giải thi đấu TDTT cấp trường trở lên.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="the-luc-4" name="the_luc_options">
+                        <label for="the-luc-4">Tham gia rèn luyện thể thao định kỳ tại 01 Câu lạc bộ, Đội, Nhóm về TDTT trong Nhà trường.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="the-luc-5" name="the_luc_options">
+                        <label for="the-luc-5">Tham gia và có giấy chứng nhận tại các chương trình có hoạt động teambuilding.</label>
+                    </div>
+                    <div class="proof-upload">
+                        <label for="proof_the_luc">Link minh chứng Thể lực:</label>
+                        <input type="text" id="proof_the_luc" name="proof_the_luc" placeholder="Dán link Google Drive/OneDrive minh chứng...">
+                    </div>
+                </div>
+
+                <!-- Tiêu chí 4: Tình nguyện -->
+                <div class="assessment-group">
+                    <h3>4. Tiêu chí Tình nguyện</h3>
+                    <p class="mb-4 font-semibold">Đạt 01 trong các tiêu chuẩn sau:</p>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="tinh-nguyen-1" name="tinh_nguyen_options">
+                        <label for="tinh-nguyen-1">Tham gia và đạt giấy chứng nhận hoàn thành chiến dịch tình nguyện hè / Đông - Xuân.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="tinh-nguyen-2" name="tinh_nguyen_options">
+                        <label for="tinh-nguyen-2">Đạt 01 Giấy chứng nhận tham gia hoạt động tình nguyện tại chỗ.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="tinh-nguyen-3" name="tinh_nguyen_options">
+                        <label for="tinh-nguyen-3">Được giấy khen cấp Trường, Đoàn Trường trở lên về hoạt động tình nguyện.</label>
+                    </div>
+                    <div class="proof-upload">
+                        <label for="proof_tinh_nguyen">Link minh chứng Tình nguyện:</label>
+                        <input type="text" id="proof_tinh_nguyen" name="proof_tinh_nguyen" placeholder="Dán link Google Drive/OneDrive minh chứng...">
+                    </div>
+                </div>
+
+                <!-- Tiêu chí 5: Hội nhập -->
+                <div class="assessment-group">
+                    <h3>5. Tiêu chí Hội nhập</h3>
+                    <p class="mb-4 font-semibold">Đạt 01 trong các tiêu chí sau:</p>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="hoi-nhap-1" name="hoi_nhap_options">
+                        <label for="hoi-nhap-1">Tham gia ít nhất 01 hoạt động hội nhập giao lưu quốc tế, hội thảo quốc gia, quốc tế.</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="hoi-nhap-2" name="hoi_nhap_options">
+                        <label for="hoi-nhap-2">Đạt chứng chỉ ngoại ngữ 2 trình độ A2 (sinh viên chuyên ngữ) hoặc ngoại ngữ B1 Anh (sinh viên không chuyên ngữ).</label>
+                    </div>
+                    <div class="assessment-item">
+                        <input type="checkbox" id="hoi-nhap-3" name="hoi_nhap_options">
+                        <label for="hoi-nhap-3">Tham gia và đạt giải trong các cuộc thi về ngoại ngữ cấp Liên Chi Đoàn, Liên Chi hội, Khoa, Câu lạc bộ trở lên.</label>
+                    </div>
+                    <div class="proof-upload">
+                        <label for="proof_hoi_nhap">Link minh chứng Hội nhập:</label>
+                        <input type="text" id="proof_hoi_nhap" name="proof_hoi_nhap" placeholder="Dán link Google Drive/OneDrive minh chứng...">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-cyan-600 text-white py-4 rounded-lg text-xl font-bold hover:bg-cyan-700 transition duration-300">
+                    Nộp hồ sơ tự đánh giá
+                </button>
+            </form>
+            <div id="assessment-message" class="mt-4 text-center"></div>
+        </div>
+
+        <!-- Trang Tin tức -->
+        <div id="page-tin-tuc" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Tin tức - Hoạt động</h2>
+            <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Tin tức sẽ được tải từ Firestore -->
+                <p>Đang tải tin tức...</p>
+            </div>
+        </div>
+
+        <!-- Trang Những câu chuyện -->
+        <div id="page-nhung-cau-chuyen" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Những câu chuyện đẹp</h2>
+            <div id="stories-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Câu chuyện sẽ được tải từ Firestore -->
+                <p>Đang tải các câu chuyện...</p>
+            </div>
+        </div>
+
+        <!-- Trang Liên hệ -->
+        <div id="page-lien-he" class="page-content">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--mau-chu);">Liên hệ</h2>
+            <p class="text-lg mb-4">Mọi thắc mắc, vui lòng liên hệ:</p>
+            <ul class="list-disc list-inside space-y-3 text-lg">
+                <li>Fanpage: <a href="#" class="text-cyan-600 hover:underline">Đoàn Thanh niên – Hội Sinh viên Trường Đại học Ngoại ngữ, Đại học Đà Nẵng</a></li>
+                <li>Fanpage: <a href="#" class="text-cyan-600 hover:underline">Câu lạc bộ Sinh viên 5 tốt Trường Đại học Ngoại ngữ, ĐHĐN</a></li>
+                <li>Email: <a href="mailto:sv5t.dhdn.dtn@gmail.com" class="text-cyan-600 hover:underline">sv5t.dhdn.dtn@gmail.com</a></li>
+                <li>Địa chỉ: Văn phòng ĐTN - HSV Nhà trường, ...</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 - Website Tư vấn Sinh viên 5 tốt - Trường Đại học Ngoại ngữ, ĐHĐN</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import các hàm từ Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            // signInWithCustomToken, // Không dùng trên GitHub Pages
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            onSnapshot, 
+            collection, 
+            query,
+            addDoc,
+            serverTimestamp,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CẤU HÌNH FIREBASE (QUAN TRỌNG!) ---
+        // BƯỚC 1: Đã thêm config Firebase của bạn
+        const firebaseConfig = {
+          apiKey: "AIzaSyDl14prYvMw4ES8AyCmTRrG0mG4PLTFOMk",
+          authDomain: "website-tu-van-sv5t.firebaseapp.com",
+          projectId: "website-tu-van-sv5t",
+          storageBucket: "website-tu-van-sv5t.firebasestorage.app",
+          messagingSenderId: "2501484852",
+          appId: "1:2501484852:web:f445a3400ebcc8d8304561"
+        };
+        
+        // BƯỚC 2: Đặt một ID cho ứng dụng của bạn
+        // (Phải giống hệt với file admin.html và trong Firebase Rules)
+        const appId = 'sv5t-app-id-cua-ban'; // <-- GIỮ NGUYÊN ID NÀY
+        
+        // Khởi tạo Firebase
+        let app, db, auth;
+
+        // Khởi tạo app
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+        let userId = null;
+        let dbCriteriaData = {}; // Lưu trữ dữ liệu tiêu chí từ Firestore
+        let dbChatbotQA = []; // Lưu trữ Q&A từ Firestore
+
+        // --- HÀM KHỞI CHẠY CHÍNH ---
+        async function main() {
+            await setupAuth();
+            setupNavigation();
+            setupChatbot();
+            setupCriteriaPage();
+            setupAssessmentPage();
+            loadNews();
+            loadStories();
+            // loadUserTracking() sẽ được gọi bên trong setupAuth sau khi có userId
+        }
+
+        // --- 1. XÁC THỰC NGƯỜI DÙNG ---
+        async function setupAuth() {
+            const userInfoDiv = document.getElementById('user-info');
+            
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    userInfoDiv.innerHTML = `Chào, <span class="font-semibold">${userId.substring(0, 8)}...</span>`;
+                    // Tải lại dữ liệu theo dõi khi có user ID
+                    loadUserTracking();
+                } else {
+                    userId = null;
+                    userInfoDiv.innerHTML = "Đang kết nối...";
+                }
+            });
+
+            try {
+                // BƯỚC 3: Chỉ dùng signInAnonymously cho GitHub Pages
+                await signInAnonymously(auth);
+                
+            } catch (error) {
+                console.error("Lỗi xác thực:", error);
+                userInfoDiv.innerHTML = "Lỗi kết nối";
+                // Hiển thị lỗi cho người dùng
+                if (error.code === 'auth/internal-error') {
+                    alert("LỖI CẤU HÌNH FIREBASE: Bạn chưa dán firebaseConfig của mình vào file index.html, hoặc cấu hình bị sai. Vui lòng kiểm tra lại.");
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    alert("LỖI CẤU HÌNH FIREBASE: Bạn chưa bật phương thức đăng nhập 'Anonymous' (Ẩn danh) trong Firebase Authentication. Vui lòng vào trang quản trị Firebase để bật.");
+                }
+            }
+        }
+
+        // --- 2. ĐIỀU HƯỚNG TRANG (SPA) ---
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageContents = document.querySelectorAll('.page-content');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const pageId = `page-${item.dataset.page}`;
+                    
+                    // Ẩn tất cả trang
+                    pageContents.forEach(page => page.classList.remove('active'));
+                    
+                    // Hiện trang được chọn
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) {
+                        targetPage.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // --- 3. CHATBOT TƯ VẤN ---
+        function setupChatbot() {
+            const chatContainer = document.getElementById('chat-container');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const quickRepliesContainer = document.getElementById('quick-replies');
+
+            // Lắng nghe Q&A từ Admin Panel
+            const qaRef = collection(db, `/artifacts/${appId}/public/data/chatbot_qa`);
+            onSnapshot(qaRef, (snapshot) => {
+                dbChatbotQA = [];
+                snapshot.forEach(doc => {
+                    dbChatbotQA.push(doc.data());
+                });
+                console.log("Chatbot Q&A đã được cập nhật.");
+            }, (error) => {
+                console.error("Lỗi tải Chatbot Q&A: ", error);
+                if (error.code === 'permission-denied') {
+                    alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể đọc dữ liệu Chatbot. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                }
+            });
+
+            sendBtn.addEventListener('click', handleSend);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSend();
+            });
+            quickRepliesContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('quick-reply-btn')) {
+                    const question = e.target.dataset.question;
+                    addMessage(question, 'user');
+                    getBotResponse(question);
+                }
+            });
+
+            function handleSend() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, 'user');
+                    getBotResponse(message);
+                    chatInput.value = '';
+                }
+            }
+
+            function addMessage(message, sender, isHTML = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
+                if (isHTML) {
+                    messageDiv.innerHTML = message;
+                } else {
+                    messageDiv.textContent = message;
+                }
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function getBotResponse(userQuestion) {
+                const lowerQuestion = userQuestion.toLowerCase();
+                let response = "";
+                let isHTML = false;
+
+                // --- Logic Chatbot cố định ---
+                if (lowerQuestion.includes("xin chào")) {
+                    response = "Cảm ơn bạn đã đến với Website Tư vấn Sinh viên 5 tốt, bạn muốn hỏi gì về Danh hiệu Sinh viên 5 tốt?";
+                } 
+                else if (lowerQuestion.includes("danh hiệu sinh viên 5 tốt là gì")) {
+                    response = 'Danh hiệu "Sinh viên 5 tốt" là một danh hiệu cao quý do Trung ương Hội Sinh viên Việt Nam phát động, nhằm tôn vinh sự nỗ lực của sinh viên qua 5 tiêu chí: Học tập tốt – Đạo đức tốt – Thể lực tốt – Tình nguyện tốt – Hội nhập tốt.';
+                }
+                else if (lowerQuestion.includes("tiêu chí") && lowerQuestion.includes("cấp trường")) {
+                    response = "Bạn muốn hỏi về tiêu chí nào trước: Đạo đức, Học tập, Thể lực, Tình nguyện hay Hội nhập?";
+                }
+                // Trả lời tiêu chí chi tiết
+                else if (dbCriteriaData.cap_truong_dknn) {
+                    const criteria = dbCriteriaData.cap_truong_dknn;
+                    if (lowerQuestion.includes("đạo đức")) {
+                        response = `<b>Tiêu chí Đạo đức (Cấp Trường):</b><br>${criteria.dao_duc}`;
+                        isHTML = true;
+                    } else if (lowerQuestion.includes("học tập")) {
+                        response = `<b>Tiêu chí Học tập (Cấp Trường):</b><br>${criteria.hoc_tap}`;
+                        isHTML = true;
+                    } else if (lowerQuestion.includes("thể lực")) {
+                        response = `<b>Tiêu chí Thể lực (Cấp Trường):</b><br>${criteria.the_luc}`;
+                        isHTML = true;
+                    } else if (lowerQuestion.includes("tình nguyện")) {
+                        response = `<b>Tiêu chí Tình nguyện (Cấp Trường):</b><br>${criteria.tinh_nguyen}`;
+                        isHTML = true;
+                    } else if (lowerQuestion.includes("hội nhập")) {
+                        response = `<b>Tiêu chí Hội nhập (Cấp Trường):</b><br>${criteria.hoi_nhap}`;
+                        isHTML = true;
+                    }
+                }
+                
+                // --- Logic kiểm tra minh chứng (đơn giản) ---
+                if (!response && (lowerQuestion.includes("giấy chứng nhận") || lowerQuestion.includes("giấy khen"))) {
+                    if (lowerQuestion.includes("tình nguyện hè") || lowerQuestion.includes("hoạt động tình nguyện") || lowerQuestion.includes("giấy khen về tình nguyện")) {
+                        response = "Minh chứng của bạn có vẻ hợp lệ cho tiêu chí Tình nguyện.";
+                    } else if (lowerQuestion.includes("hoạt động thể thao") || lowerQuestion.includes("teambuilding")) {
+                        response = "Minh chứng của bạn có vẻ hợp lệ cho tiêu chí Thể lực.";
+                    } else if (lowerQuestion.includes("giao lưu quốc tế") || lowerQuestion.includes("hội thảo quốc tế") || lowerQuestion.includes("thi ngoại ngữ")) {
+                        response = "Minh chứng của bạn có vẻ hợp lệ cho tiêu chí Hội nhập.";
+                    } else {
+                        response = "Minh chứng của bạn chưa hợp lệ hoặc tôi chưa rõ, bạn có minh chứng nào khác không?";
+                    }
+                }
+
+                // --- Logic Q&A động từ Firestore ---
+                if (!response) {
+                    const foundQA = dbChatbotQA.find(qa => lowerQuestion.includes(qa.question.toLowerCase()));
+                    if (foundQA) {
+                        response = foundQA.answer;
+                    }
+                }
+
+                // --- Fallback ---
+                if (!response) {
+                    response = "Tôi sẽ cập nhật lại thông tin. Để không mất thời gian chờ đợi, bạn có thể truy cập vào trang fanpage “Đoàn Thanh niên – Hội Sinh viên Trường Đại học Ngoại ngữ, Đại học Đà Nẵng” hoặc Câu lạc bộ Sinh viên 5 tốt Trường Đại học Ngoại ngữ, ĐHĐN để biết thêm thông tin chi tiết nhé!";
+                }
+
+                // Trả lời sau 1 giây
+                setTimeout(() => {
+                    addMessage(response, 'bot', isHTML);
+                }, 500);
+            }
+        }
+
+        // --- 4. BỘ TIÊU CHÍ ---
+        function setupCriteriaPage() {
+            const selectionDiv = document.getElementById('criteria-selection');
+            const contentDiv = document.getElementById('criteria-content');
+            const criteriaDetails = document.getElementById('criteria-details');
+            const criteriaTitle = document.getElementById('criteria-title');
+            const backBtn = document.getElementById('back-to-selection');
+
+            // Tải dữ liệu tiêu chí từ Firestore
+            const criteriaRef = collection(db, `/artifacts/${appId}/public/data/criteria`);
+            onSnapshot(criteriaRef, (snapshot) => {
+                dbCriteriaData = {};
+                snapshot.forEach(doc => {
+                    dbCriteriaData[doc.id] = doc.data();
+                });
+                console.log("Dữ liệu tiêu chí đã được tải.");
+                // Kích hoạt nút bấm sau khi tải xong
+                selectionDiv.querySelector('button[data-level="cap_truong_dknn"]').disabled = false;
+            }, (error) => {
+                console.error("Lỗi tải Tiêu chí: ", error);
+                if (error.code === 'permission-denied') {
+                    alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể đọc dữ liệu Tiêu chí. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                }
+            });
+
+            selectionDiv.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const level = e.target.dataset.level;
+                    const data = dbCriteriaData[level];
+                    
+                    if (data) {
+                        criteriaTitle.textContent = e.target.textContent.trim();
+                        criteriaDetails.innerHTML = `
+                            <table class="criteria-table">
+                                <tr><th>Đạo đức</th><td>${data.dao_duc || 'Đang cập nhật...'}</td></tr>
+                                <tr><th>Học tập</th><td>${data.hoc_tap || 'Đang cập nhật...'}</td></tr>
+                                <tr><th>Thể lực</th><td>${data.the_luc || 'Đang cập nhật...'}</td></tr>
+                                <tr><th>Tình nguyện</th><td>${data.tinh_nguyen || 'Đang cập nhật...'}</td></tr>
+                                <tr><th>Hội nhập</th><td>${data.hoi_nhap || 'Đang cập nhật...'}</td></tr>
+                            </table>
+                        `;
+                        selectionDiv.style.display = 'none';
+                        contentDiv.style.display = 'block';
+                    } else {
+                        alert("Dữ liệu cho cấp này đang được cập nhật.");
+                    }
+                }
+            });
+
+            backBtn.addEventListener('click', () => {
+                contentDiv.style.display = 'none';
+                selectionDiv.style.display = 'grid';
+            });
+        }
+
+        // --- 5. TỰ ĐÁNH GIÁ ---
+        function setupAssessmentPage() {
+            const form = document.getElementById('assessment-form');
+            const messageDiv = document.getElementById('assessment-message');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!userId) {
+                    messageDiv.textContent = "Lỗi: Không thể xác thực người dùng. Vui lòng tải lại trang.";
+                    messageDiv.className = "text-red-600";
+                    return;
+                }
+
+                messageDiv.textContent = "Đang nộp hồ sơ...";
+                messageDiv.className = "text-blue-600";
+
+                try {
+                    // Hàm kiểm tra 1 trong nhiều
+                    const checkCriteria = (name) => document.querySelectorAll(`input[name="${name}"]:checked`).length > 0;
+                    
+                    const assessmentYear = "2024-2025";
+                    const assessmentLevel = "cap_truong_dknn";
+
+                    const assessmentData = {
+                        level: assessmentLevel,
+                        year: assessmentYear,
+                        status: "pending", // Chờ admin duyệt
+                        adminFeedback: "",
+                        userId: userId,
+                        submittedAt: serverTimestamp(),
+                        criteria: {
+                            dao_duc: {
+                                met: checkCriteria('dao_duc_options'),
+                                proof: document.getElementById('proof_dao_duc').value,
+                                adminNotes: ""
+                            },
+                            hoc_tap: {
+                                met: checkCriteria('hoc_tap_options'),
+                                proof: document.getElementById('proof_hoc_tap').value,
+                                adminNotes: ""
+                            },
+                            the_luc: {
+                                met: checkCriteria('the_luc_options'),
+                                proof: document.getElementById('proof_the_luc').value,
+                                adminNotes: ""
+                            },
+                            tinh_nguyen: {
+                                met: checkCriteria('tinh_nguyen_options'),
+                                proof: document.getElementById('proof_tinh_nguyen').value,
+                                adminNotes: ""
+                            },
+                            hoi_nhap: {
+                                met: checkCriteria('hoi_nhap_options'),
+                                proof: document.getElementById('proof_hoi_nhap').value,
+                                adminNotes: ""
+                            }
+                        }
+                    };
+
+                    // *** FIX: Lưu vào collection PUBLIC để Admin có thể đọc ***
+                    // Tạo một ID tài liệu duy nhất cho hồ sơ này
+                    const docId = `${userId}_${assessmentLevel}_${assessmentYear}`;
+                    const assessmentDocRef = doc(db, `/artifacts/${appId}/public/data/assessments`, docId);
+                    await setDoc(assessmentDocRef, assessmentData);
+                    
+                    messageDiv.textContent = "Nộp hồ sơ thành công! Bạn có thể xem trạng thái ở mục 'Tự theo dõi'.";
+                    messageDiv.className = "text-green-600";
+                    form.reset();
+                    
+                    // Tải lại trang theo dõi
+                    loadUserTracking();
+                } catch (error) {
+                    console.error("Lỗi nộp hồ sơ:", error);
+                    messageDiv.textContent = "Đã xảy ra lỗi khi nộp hồ sơ. Vui lòng thử lại.";
+                    messageDiv.className = "text-red-600";
+                    if (error.code === 'permission-denied') {
+                        alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể nộp hồ sơ. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                    }
+                }
+            });
+        }
+        
+        // --- 6. TỰ THEO DÕI ---
+        function loadUserTracking() {
+            if (!userId) return; // Chưa có user ID
+
+            const contentDiv = document.getElementById('tracking-content');
+            
+            // *** FIX: Đọc từ collection PUBLIC, sử dụng ID tài liệu duy nhất ***
+            const docId = `${userId}_cap_truong_dknn_2024_2025`;
+            const docRef = doc(db, `/artifacts/${appId}/public/data/assessments`, docId);
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    let statusText = "Chưa rõ";
+                    let statusClass = "text-gray-600";
+                    switch (data.status) {
+                        case "pending":
+                            statusText = "Chờ duyệt";
+                            statusClass = "text-yellow-600";
+                            break;
+                        case "approved":
+                            statusText = "Đã duyệt";
+                            statusClass = "text-green-600";
+                            break;
+                        case "rejected":
+                            statusText = "Cần bổ sung";
+                            statusClass = "text-red-600";
+                            break;
+                    }
+
+                    let detailsHTML = `<p class="mb-4">Trạng thái hồ sơ: <span class="font-bold ${statusClass}">${statusText}</span></p>`;
+                    
+                    if(data.adminFeedback) {
+                        detailsHTML += `<div class="p-4 bg-white rounded shadow-inner">
+                            <h4 class="font-semibold text-gray-800 mb-2">Phản hồi chung từ Admin:</h4>
+                            <p class="text-gray-700 whitespace-pre-wrap">${data.adminFeedback}</p>
+                        </div>`;
+                    }
+
+                    detailsHTML += `<h4 class="font-semibold text-gray-800 mt-4 mb-2">Chi tiết minh chứng:</h4>
+                                    <ul class="list-disc list-inside space-y-2">`;
+                    
+                    // Hiển thị phản hồi chi tiết
+                    if (data.criteria) { // Kiểm tra data.criteria tồn tại
+                        for (const [key, value] of Object.entries(data.criteria)) {
+                            let note = value.adminNotes ? `<span class="text-red-600 italic">- ${value.adminNotes}</span>` : `<span class="text-green-600 italic">- Hợp lệ</span>`;
+                            if (data.status === 'pending') note = `<span class="text-yellow-600 italic">- Chờ duyệt</span>`;
+                            
+                            detailsHTML += `<li>
+                                <span class="font-medium capitalize">${key.replace('_', ' ')}:</span>
+                                <a href="${value.proof}" target="_blank" class="text-blue-500 hover:underline">Xem minh chứng</a> ${note}
+                            </li>`;
+                        }
+                    }
+                                    
+                    detailsHTML += `</ul>`;
+                    contentDiv.innerHTML = detailsHTML;
+
+                } else {
+                    contentDiv.innerHTML = "<p>Chưa tìm thấy hồ sơ. Vui lòng nộp hồ sơ ở mục 'Tự đánh giá' trước.</p>";
+                }
+            }, (error) => {
+                console.error("Lỗi tải trang theo dõi: ", error);
+                if (error.code === 'permission-denied') {
+                    contentDiv.innerHTML = "<p class='text-red-600'>LỖI QUYỀN TRUY CẬP: Không thể tải dữ liệu theo dõi. Vui lòng kiểm tra Firebase Rules.</p>";
+                }
+            });
+        }
+
+        // --- 7. TẢI TIN TỨC & CÂU CHUYỆN ---
+        async function loadArticles(collectionName, listElementId) {
+            const listElement = document.getElementById(listElementId);
+            const colRef = collection(db, `/artifacts/${appId}/public/data/${collectionName}`);
+            
+            try {
+                const snapshot = await getDocs(query(colRef)); // Chỉ tải 1 lần
+                if (snapshot.empty) {
+                    listElement.innerHTML = "<p>Chưa có bài viết nào.</p>";
+                    return;
+                }
+                
+                let html = "";
+                snapshot.forEach(doc => {
+                    const article = doc.data();
+                    const placeholder = `https://placehold.co/600x400/e0f2f1/00796b?text=${encodeURIComponent(article.title)}`;
+                    html += `
+                        <div class="article-card">
+                            <img src="${article.imageUrl || placeholder}" alt="${article.title}" onerror="this.src='${placeholder}'">
+                            <div class="article-card-content">
+                                <h3>${article.title}</h3>
+                                <p class="text-gray-600">${article.content.substring(0, 150)}...</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                listElement.innerHTML = html;
+            } catch (error) {
+                console.error(`Lỗi tải ${collectionName}:`, error);
+                listElement.innerHTML = `<p>Lỗi tải dữ liệu. Vui lòng thử lại.</p>`;
+                if (error.code === 'permission-denied') {
+                    alert("LỖI QUYỀN TRUY CẬP FIREBASE: Không thể đọc dữ liệu Tin tức/Câu chuyện. Vui lòng kiểm tra lại Firebase Security Rules của bạn.");
+                }
+            }
+        }
+
+        function loadNews() {
+            loadArticles('news', 'news-list');
+        }
+
+        function loadStories() {
+            loadArticles('stories', 'stories-list');
+        }
+
+        // --- KHỞI CHẠY ---
+        main();
+    </script>
+</body>
+</html>
